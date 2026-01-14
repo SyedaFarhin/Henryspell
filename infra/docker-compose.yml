@@ -1,0 +1,30 @@
+version: '3.8'
+services:
+  mongo:
+    image: mongo:6
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+  backend:
+    build: ./backend
+    ports:
+      - "4000:4000"
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/henryspell
+      - JWT_ACCESS_SECRET=dev_access_secret
+      - JWT_REFRESH_SECRET=dev_refresh_secret
+      - STRIPE_SECRET_KEY=sk_test_xxx
+      - STRIPE_WEBHOOK_SECRET=whsec_xxx
+      - FRONTEND_URL=http://localhost:5173
+    depends_on:
+      - mongo
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+volumes:
+  mongo-data:
